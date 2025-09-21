@@ -29,31 +29,44 @@ const keys = {};
 document.addEventListener('keydown', e => keys[e.key] = true);
 document.addEventListener('keyup', e => keys[e.key] = false);
 
-// Game update
+// Game update with axis-separated collisions
 function update() {
-    // Move player
-    if(keys['w']) player.y -= player.speed;
-    if(keys['s']) player.y += player.speed;
-    if(keys['a']) player.x -= player.speed;
-    if(keys['d']) player.x += player.speed;
+    let nextX = player.x;
+    let nextY = player.y;
+
+    // Proposed movement
+    if(keys['w']) nextY -= player.speed;
+    if(keys['s']) nextY += player.speed;
+    if(keys['a']) nextX -= player.speed;
+    if(keys['d']) nextX += player.speed;
+
+    // X-axis collisions
+    obstacles.forEach(obs => {
+        if(nextX < obs.x + obs.width && nextX + player.size > obs.x &&
+           player.y < obs.y + obs.height && player.y + player.size > obs.y) {
+            if(keys['a']) nextX = obs.x + obs.width; // bump right
+            if(keys['d']) nextX = obs.x - player.size; // bump left
+        }
+    });
+
+    // Y-axis collisions
+    obstacles.forEach(obs => {
+        if(player.x < obs.x + obs.width && player.x + player.size > obs.x &&
+           nextY < obs.y + obs.height && nextY + player.size > obs.y) {
+            if(keys['w']) nextY = obs.y + obs.height; // bump down
+            if(keys['s']) nextY = obs.y - player.size; // bump up
+        }
+    });
+
+    // Apply movement after collision checks
+    player.x = nextX;
+    player.y = nextY;
 
     // Keep player inside canvas
     if(player.x < 0) player.x = 0;
     if(player.y < 0) player.y = 0;
     if(player.x > canvas.width - player.size) player.x = canvas.width - player.size;
     if(player.y > canvas.height - player.size) player.y = canvas.height - player.size;
-
-    // Check collisions with obstacles
-    obstacles.forEach(obs => {
-        if(player.x < obs.x + obs.width && player.x + player.size > obs.x &&
-           player.y < obs.y + obs.height && player.y + player.size > obs.y) {
-            // Simple collision response: push back
-            if(keys['w']) player.y += player.speed;
-            if(keys['s']) player.y -= player.speed;
-            if(keys['a']) player.x += player.speed;
-            if(keys['d']) player.x -= player.speed;
-        }
-    });
 
     // Collect items
     items.forEach(item => {

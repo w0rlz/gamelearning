@@ -9,4 +9,14 @@ function update() {
   playerX += 1;
   requestAnimationFrame(update);
 }
-update();
+function draw() {
+  ctx.drawImage(img, playerX, playerY,32,32);
+}
+
+function loop() {
+    update();    // Update game state
+    draw();      // Draw the new frame
+    requestAnimationFrame(loop); // Call loop again for next frame
+}
+
+loop(); // Start the infinite loop

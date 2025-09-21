@@ -5,9 +5,7 @@ const img = new Image();
 img.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><rect width='100' height='100' fill='green'/></svg>";
 document.body.appendChild(img);
 function update() {
-  ctx.drawImage(img, playerX, playerY,32,32);
   playerX += 1;
-  requestAnimationFrame(update);
 }
 function draw() {
   ctx.drawImage(img, playerX, playerY,32,32);
